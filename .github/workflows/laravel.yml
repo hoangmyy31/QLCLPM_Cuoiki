@@ -8,45 +8,51 @@ on:
 
 jobs:
   laravel-tests:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
           coverage: none
           tools: composer:v2
-    - name: Cache Composer dependencies
+
+      - name: Cache Composer dependencies
         uses: actions/cache@v4
-        with:  
+        with:
           path: ~/.composer/cache/files
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-   - name: Copy .env
+
+      - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
 
-    - name: Check coding convention by PHP_CodeSniffer
-      run: ./vendor/bin/phpcs
+      - name: Check coding convention by PHP_CodeSniffer
+        run: ./vendor/bin/phpcs
 
-    - name: PHP mess detector
-    run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
-    - name: Generate key
-      run: php artisan key: generate
+      - name: PHP mess detector
+        run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
 
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
+      - name: Generate key
+        run: php artisan key:generate
 
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.sqlite
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
 
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      env:
-        DB_CONNECTION: sqlite
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: vendor/bin/phpunit

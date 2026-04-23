@@ -31,17 +31,10 @@ jobs:
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-      - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
-
-      - name: Check coding convention by PHP_CodeSniffer
-        run: ./vendor/bin/phpcs
-
-      - name: PHP mess detector
-        run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
-
-      - name: Generate key
-        run: php artisan key:generate
+      - name: Configure CI environment
+        run: |
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=${{ github.workspace }}/database/database.sqlite" >> .env
 
       - name: Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
@@ -50,6 +43,21 @@ jobs:
         run: |
           mkdir -p database
           touch database/database.sqlite
+
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Discover packages
+        run: php artisan package:discover --ansi
+
+      - name: Check coding convention by PHP_CodeSniffer
+        run: ./vendor/bin/phpcs
+
+      - name: PHP mess detector
+        run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
 
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:

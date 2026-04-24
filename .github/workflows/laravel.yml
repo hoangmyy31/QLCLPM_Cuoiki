@@ -50,14 +50,14 @@ jobs:
       - name: Check coding convention by PHP_CodeSniffer
         run: ./vendor/bin/phpcs
 
+      - name: PHP mess detector
+        run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
+
       - name: Generate key
         run: php artisan key:generate
 
       - name: Discover packages
         run: php artisan package:discover --ansi
-
-      - name: PHP mess detector
-        run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml
 
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:

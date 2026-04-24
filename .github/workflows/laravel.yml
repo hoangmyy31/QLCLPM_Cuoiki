@@ -47,14 +47,14 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-progress --prefer-dist --no-scripts
 
+      - name: Check coding convention by PHP_CodeSniffer
+        run: ./vendor/bin/phpcs
+
       - name: Generate key
         run: php artisan key:generate
 
       - name: Discover packages
         run: php artisan package:discover --ansi
-
-      - name: Check coding convention by PHP_CodeSniffer
-        run: ./vendor/bin/phpcs
 
       - name: PHP mess detector
         run: ./vendor/bin/phpmd app,database,routes,tests text phpmd.xml

@@ -36,3 +36,4 @@ Quickly set up skeleton for your Laravel 7.x app
 ## License
 
 [MIT license](https://opensource.org/licenses/MIT).
+
